@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
+-->
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Birthday Invite</title>
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<style>
+  body {
+   
+    font-family: 'Brush Script MT', cursive;
+    font-size: 40px;
+    background: #fff2fd;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    flex-direction: column;
+  }
+
+  /* --- ENVELOPE ANIMATION --- */
+  #envelopeContainer {
+    position: relative;
+    cursor: pointer;
+    animation: wiggle 1.5s infinite ease-in-out;
+  }
+
+  #envelopeContainer:hover {
+    animation: wiggle 0.25s infinite ease-in-out;
+  }
+
+  @keyframes wiggle {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(-4deg); }
+    50% { transform: rotate(4deg); }
+    75% { transform: rotate(-4deg); }
+    100% { transform: rotate(0deg); }
+  }
+
+  #closedEnvelope, #openEnvelope {
+    width: 350px;
+    transition: opacity 0.5s ease;
+  }
+
+  #openEnvelope {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+  }
+
+  /* --- INVITE + BUTTONS WRAPPER --- */
+ #inviteWrapper {
+  position: relative;
+  display: none;
+  width: 90vw;
+  max-width: 400px; /* PC size */
+}
+
+/* Invite image for PC */
+#inviteCard {
+  opacity: 0;
+  transform: scale(0.1);
+  transform-origin: center center;
+  transition: transform 0.8s ease, opacity 0.8s ease;
+  width: 90vw;
+  max-width: 400px;
+  height: auto;
+  display: none;
+}
+
+/* FULL WIDTH only on phones */
+@media (max-width: 600px) {
+  #inviteWrapper {
+    width: 100vw;
+    max-width: none;
+  }
+  #inviteCard {
+    width: 100vw;
+    max-width: none;
+  }
+}
+
+  /* --- BUTTONS ON INVITE --- */
+  #yesBtn, #noBtn {
+    font-family: 'Brush Script MT', cursive;
+    position: absolute;
+    bottom: 35px;
+    font-size: 20px;
+    padding: 12px 20px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+    background: #000;
+    color: #ffcbf7;
+  }
+
+  #yesBtn { left: 10px; }
+  #noBtn  { right: 10px; }
+
+  #yesBtn:hover, #noBtn:hover {
+    transform: scale(1.1);
+  }
+
+  /* --- RESULT SCREENS --- */
+  .resultScreen {
+    display: none;
+    text-align: center;
+  }
+
+  .resultImage {
+    max-width: 90vw;
+    max-height: 70vh;
+    margin-bottom: 20px;
+  }
+
+  .downloadBtn {
+     font-family: 'Brush Script MT', cursive;
+    font-size: 20px;
+    padding: 12px 20px;
+    background: #000;
+    color: #ffcbf7;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+  }
+</style>
+
+</head>
+<body>
+
+<!-- YES RESULT SCREEN -->
+<div id="resultYes" class="resultScreen">
+     <p style="font-size:30px; color:#000; margin-bottom:15px;">
+    I will be waiting 💖
+  </p>
+  <img src="funny.jpg" class="resultImage">
+  <br>
+  <a href="invite.jpg" download="BirthdayInvite.jpg">
+    <button class="downloadBtn">Download Invite 📥</button>
+  </a>
+</div>
+
+<!-- NO RESULT SCREEN -->
+<div id="resultNo" class="resultScreen">
+  <img src="susy.jpg" class="resultImage">
+  <p style="font-size:22px; color:#000;">Are you sure?</p>
+  <button onclick="showNoScreen()" style="
+    font-size:20px;
+    padding:12px 20px;
+    background:#000000;
+    color:#ffcbf7;
+    border:none;
+    border-radius:12px;
+    margin:10px;
+    cursor:pointer;">
+    Yes
+  </button>
+
+  <button onclick="sendResponse('Yes')" style="
+    font-size:20px;
+    padding:12px 20px;
+    background:#000000;
+    color:#ffcbf7;
+    border:none;
+    border-radius:12px;
+    margin:10px;
+    cursor:pointer;">
+    No
+  </button>
+</div>
+<!-- FINAL NO RESULT SCREEN -->
+<div id="resultFinalNo" class="resultScreen">
+     <p style="font-size:40px; color:#000; margin-bottom:15px;">
+    Fine, I hope you have a good excuse...
+  </p>
+  <img src="sadge.jpg" class="resultImage">
+  <br>
+</div>
+<!-- ENVELOPE -->
+<div id="envelopeContainer">
+  <img id="closedEnvelope" src="closed-envelope.png">
+  <img id="openEnvelope" src="open-envelope.png">
+</div>
+
+<!-- INVITE -->
+<div id="inviteWrapper">
+  <img id="inviteCard" src="invite.jpg">
+  <button id="yesBtn" onclick="sendResponse('Yes')">Yes 💖</button>
+  <button id="noBtn" onclick="sendResponse('No')">No</button>
+</div>
+
+<script>
+/* --- SOUND EFFECTS --- */
+const yesSound = new Audio("happy.mp3");
+const noSound = new Audio("sus.mp3");
+const noFinalSound = new Audio("sad.mp3");
+const openSound = new Audio("open.mp3");
+
+/* Track how many times user pressed NO */
+let noCount = 0;
+
+/* --- CONFETTI --- */
+function launchConfetti() {
+  const count = 150;
+  const colors = ["#ffcbf7", "#000000", "#fff2fd", "#ff92e0"];
+
+  for (let i = 0; i < count; i++) {
+    const piece = document.createElement("div");
+    piece.style.position = "fixed";
+    piece.style.width = "8px";
+    piece.style.height = "8px";
+    piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.top = "-10px";
+    piece.style.left = Math.random() * window.innerWidth + "px";
+    piece.style.opacity = 0.9;
+    piece.style.borderRadius = "50%";
+    piece.style.zIndex = 99999;
+
+    document.body.appendChild(piece);
+
+    const fall = 2000 + Math.random() * 2000;
+    piece.animate([
+      { transform: "translateY(0px) rotate(0deg)" },
+      { transform: `translateY(${window.innerHeight}px) rotate(360deg)` }
+    ], {
+      duration: fall,
+      easing: "ease-in"
+    });
+
+    setTimeout(() => piece.remove(), fall);
+  }
+}
+
+/* --- READ GUEST FROM URL --- */
+const urlParams = new URLSearchParams(window.location.search);
+const guest = urlParams.get("guest") || "Unknown";
+
+/* --- ENVELOPE CLICK -> OPEN INVITE --- */
+document.getElementById("envelopeContainer").onclick = () => {
+    launchConfetti();
+openSound.play();
+  const closed = document.getElementById("closedEnvelope");
+  const open = document.getElementById("openEnvelope");
+  const box = document.getElementById("envelopeContainer");
+  const wrapper = document.getElementById("inviteWrapper");
+  const card = document.getElementById("inviteCard");
+  
+  closed.style.opacity = "0";
+  open.style.opacity = "1";
+
+  setTimeout(() => box.style.opacity = "0", 300);
+  setTimeout(() => box.style.display = "none", 600);
+
+  setTimeout(() => {
+    wrapper.style.display = "block";
+    card.style.display = "block";
+  }, 620);
+
+  setTimeout(() => {
+    card.style.opacity = "1";
+    card.style.transform = "scale(1)";
+    launchConfetti();
+  }, 700);
+};
+
+/* --- MAIN SEND RESPONSE --- */
+function sendResponse(answer) {
+   openSound.pause();
+  /* YES BUTTON */
+  if (answer === "Yes") {
+    yesSound.play();
+
+    fetch("https://script.google.com/macros/s/AKfycbx44BpnAP67E7XgQjfFHnvP65hO1T8BBKhPJUcYVek7er5GHCE7OUpIQ08xeNhoT4t1/exec", {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify({ response: answer, guest })
+    });
+
+    document.getElementById("inviteWrapper").style.display = "none";
+    document.getElementById("resultNo").style.display = "none";
+    document.getElementById("resultFinalNo").style.display = "none";
+
+    launchConfetti();
+    document.getElementById("resultYes").style.display = "block";
+    return;
+  }
+
+  /* NO BUTTON */
+  if (answer === "No") {
+      
+    noSound.play();
+    document.getElementById("inviteWrapper").style.display = "none";
+    showNoScreen();
+  }
+}
+
+/* --- NO SCREEN LOGIC --- */
+function showNoScreen() {
+
+  // 1st, 2nd, 3rd → re-show after small delay
+  if (noCount < 4) {
+      noSound.pause();
+      noSound.currentTime = 0;
+      noSound.play();
+    document.getElementById("resultNo").style.display = "none";
+    setTimeout(() => {
+      document.getElementById("resultNo").style.display = "block";
+    }, 200);
+  }
+
+  // After 3 → final no screen
+  if (noCount === 4) {
+      noSound.pause();
+    noFinalSound.play();
+    document.getElementById("resultNo").style.display = "none";
+    document.getElementById("resultFinalNo").style.display = "block";
+  }
+
+  noCount++;
+}
+</script>
+
+
+</body>
+</html>
