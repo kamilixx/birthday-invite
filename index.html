@@ -275,17 +275,15 @@ openSound.play();
 /* --- MAIN SEND RESPONSE --- */
 function sendResponse(answer) {
    openSound.pause();
-  /* YES BUTTON */
-  if (answer === "Yes") {
-    yesSound.play();
-
-    fetch("https://script.google.com/macros/s/AKfycbx44BpnAP67E7XgQjfFHnvP65hO1T8BBKhPJUcYVek7er5GHCE7OUpIQ08xeNhoT4t1/exec", {
+     fetch("https://script.google.com/macros/s/AKfycbx44BpnAP67E7XgQjfFHnvP65hO1T8BBKhPJUcYVek7er5GHCE7OUpIQ08xeNhoT4t1/exec", {
       method: "POST",
       mode: "no-cors",
       headers: { "Content-Type": "text/plain" },
       body: JSON.stringify({ response: answer, guest })
-    });
-
+        });
+  /* YES BUTTON */
+  if (answer === "Yes") {
+    yesSound.play();
     document.getElementById("inviteWrapper").style.display = "none";
     document.getElementById("resultNo").style.display = "none";
     document.getElementById("resultFinalNo").style.display = "none";
@@ -297,14 +295,6 @@ function sendResponse(answer) {
 
   /* NO BUTTON */
   if (answer === "No") {
-      
-    noSound.play();
-      fetch("https://script.google.com/macros/s/AKfycbx44BpnAP67E7XgQjfFHnvP65hO1T8BBKhPJUcYVek7er5GHCE7OUpIQ08xeNhoT4t1/exec", {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "text/plain" },
-      body: JSON.stringify({ response: answer, guest })
-    });
 
     document.getElementById("inviteWrapper").style.display = "none";
     showNoScreen();
